@@ -9,6 +9,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { OptimizationResultData, SteelItemsSchema } from "@shared/schema";
 import { exportToExcel } from "@/lib/excelExport";
 import { z } from "zod";
+import ExcelUploader from "./ExcelUploader";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SteelCuttingFormProps {
   onOptimizationResult: (result: OptimizationResultData) => void;
@@ -140,8 +143,25 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
     }
   };
 
+  const handleExcelDataLoaded = (excelData: SteelItem[]) => {
+    setRows(excelData);
+  };
+
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+      {/* Excel Upload Section */}
+      <Card className="bg-green-50 border-green-200">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base font-medium text-green-800">Upload from Excel</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ExcelUploader onDataLoaded={handleExcelDataLoaded} />
+        </CardContent>
+      </Card>
+
+      <Separator className="my-6" />
+
+      <h3 className="text-base font-medium mb-3">Manual Data Entry</h3>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -205,7 +225,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
           variant="default"
           onClick={handleCalculate}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90"
+          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
         >
           <Calculator className="h-4 w-4" /> Calculate
         </Button>
@@ -214,7 +234,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
           variant="outline"
           onClick={handleExport}
           disabled={!result}
-          className="inline-flex items-center gap-2 text-accent hover:text-accent border-accent hover:bg-orange-50"
+          className="inline-flex items-center gap-2 text-yellow-600 hover:text-yellow-700 border-yellow-600 hover:bg-yellow-50"
         >
           <FileDown className="h-4 w-4" /> Export
         </Button>
