@@ -22,9 +22,9 @@ export function validateSteelItems(items: SteelItem[]): string | null {
       return "Quantity must be a positive number";
     }
     
-    // Maximum length check (assuming standard bar length is 3000mm)
-    if (item.length > 3000) {
-      return `Length ${item.length}mm exceeds maximum standard length of 3000mm`;
+    // Maximum length check (assuming standard bar length is 11700mm)
+    if (item.length > 11700) {
+      return `Length ${item.length}mm exceeds maximum standard length of 11700mm`;
     }
   }
   

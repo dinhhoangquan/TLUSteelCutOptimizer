@@ -33,6 +33,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertSteelItemSchema = createInsertSchema(steelItems).pick({
   length: true,
   quantity: true,
+  userId: true,
 });
 
 export const insertOptimizationResultSchema = createInsertSchema(optimizationResults).pick({

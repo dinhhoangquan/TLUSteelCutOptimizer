@@ -57,7 +57,7 @@ export class MemStorage implements IStorage {
 
   async createSteelItem(insertItem: InsertSteelItem): Promise<SteelItem> {
     const id = this.steelItemIdCounter++;
-    const item: SteelItem = { ...insertItem, id };
+    const item: SteelItem = { ...insertItem, id, userId: insertItem.userId || null };
     this.steelItems.set(id, item);
     return item;
   }
@@ -87,7 +87,11 @@ export class MemStorage implements IStorage {
 
   async createOptimizationResult(insertResult: InsertOptimizationResult): Promise<OptimizationResult> {
     const id = this.optimizationResultIdCounter++;
-    const result: OptimizationResult = { ...insertResult, id };
+    const result: OptimizationResult = { 
+      ...insertResult, 
+      id,
+      userId: insertResult.userId || null
+    };
     this.optimizationResults.set(id, result);
     return result;
   }

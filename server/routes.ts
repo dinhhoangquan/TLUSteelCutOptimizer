@@ -18,7 +18,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const optimizationResult = optimizeSteelCutting(itemsResult.data);
+      const optimizationResult = await optimizeSteelCutting(itemsResult.data);
       
       // Save the optimization result if a user is logged in
       // (in a real app with auth, you'd get the userId from the session)
