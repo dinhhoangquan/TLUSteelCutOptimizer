@@ -4,8 +4,16 @@ import { storage } from "./storage";
 import { SteelItemsSchema, OptimizationResultSchema } from "@shared/schema";
 import { optimizeSteelCutting } from "./optimization";
 import { z } from "zod";
+import authRoutes from "./auth";
+import { initializeEmailTransport } from "./email";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize email transport for auth emails
+  await initializeEmailTransport();
+
+  // Register auth routes
+  app.use('/api/auth', authRoutes);
+
   // API routes for steel cutting optimization
   app.post("/api/optimize", async (req, res) => {
     try {
