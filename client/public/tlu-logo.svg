@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <circle cx="400" cy="400" r="400" fill="#0d47a1"/>
+  <g fill="#ffffff">
+    <path d="M200 200 h150 v50 h50 v-50 h150 v50 h50 v-50 h150 v400 h-550 z" fill="white"/>
+    <g fill="#0d47a1">
+      <!-- Water drop -->
+      <path d="M230 280 a40 60 0 0 1 40 60 a40 40 0 0 1 -80 0 a40 60 0 0 1 40 -60z"/>
+      <!-- Wheat stalk -->
+      <path d="M230 360 v140 m-20 -140 l20 20 l20 -20 m-20 20 v20 m-20 -20 l20 20 l20 -20 m-20 20 v20 m-20 -20 l20 20 l20 -20 m-20 20 v20 m-20 -20 l20 20 l20 -20"/>
+      
+      <!-- DHTL Letters -->
+      <path d="M340 280 h30 v15 h-15 v70 h15 v15 h-30 z"/> <!-- D -->
+      <path d="M340 250 v30 h50 v-30 z M340 320 v30 h50 v-30 z M365 250 v100"/> <!-- Đ with crossbar -->
+      <path d="M340 380 h50 v15 h-35 v25 h35 v15 h-50 z"/> <!-- H -->
+      <path d="M340 450 h50 v15 h-20 v55 h-15 v-55 h-15 z"/> <!-- T -->
+      <path d="M340 530 h50 v85 h-15 v-70 h-35 z"/> <!-- L -->
+      
+      <!-- Dam/Hydropower representation -->
+      <path d="M480 280 h200 m-30 0 v40 m-30 0 v60 m-30 0 v60 m-30 0 v60 m-30 0 v60"/> 
+      
+      <!-- Bottom lines -->
+      <path d="M200 620 h400 m0 20 h400 m0 20 h400"/>
+    </g>
+    <!-- 1959 text at bottom -->
+    <text x="400" y="720" font-size="60" text-anchor="middle">1959</text>
+  </g>
+</svg>

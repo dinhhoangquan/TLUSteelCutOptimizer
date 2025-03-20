@@ -216,7 +216,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
           type="button"
           variant="secondary"
           onClick={addRow}
-          className="inline-flex items-center gap-2"
+          className="inline-flex items-center gap-2 text-black"
         >
           <Plus className="h-4 w-4" /> Add Row
         </Button>
@@ -225,7 +225,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
           variant="default"
           onClick={handleCalculate}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
+          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-black"
         >
           <Calculator className="h-4 w-4" /> Calculate
         </Button>
@@ -234,7 +234,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
           variant="outline"
           onClick={handleExport}
           disabled={!result}
-          className="inline-flex items-center gap-2 text-yellow-600 hover:text-yellow-700 border-yellow-600 hover:bg-yellow-50"
+          className="inline-flex items-center gap-2 text-black hover:text-black border-yellow-600 hover:bg-yellow-50"
         >
           <FileDown className="h-4 w-4" /> Export
         </Button>
