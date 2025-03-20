@@ -1,67 +1,28 @@
-import { Button } from "@/components/ui/button";
-import { useContext } from "react";
-import { LanguageContext } from "@/pages/Home";
-
 export default function Footer() {
-  const { language } = useContext(LanguageContext);
-
-  const translations = {
-    en: {
-      university: "Thuy Loi University",
-      address1: "175 Tay Son, Dong Da",
-      address2: "Hanoi, Vietnam",
-      founded: "Founded: 1959",
-      contact: "Contact",
-      email: "Email: info@tlu.edu.vn",
-      phone: "Phone: (+84) 24 3852 2201",
-      fax: "Fax: (+84) 24 3563 3351",
-      team: "Development Team",
-      faculty: "IT Faculty",
-      department: "Programming Department",
-      copyright: `© ${new Date().getFullYear()} TLU Steel Optimization`
-    },
-    vi: {
-      university: "Đại học Thủy Lợi",
-      address1: "175 Tây Sơn, Đống Đa",
-      address2: "Hà Nội, Việt Nam",
-      founded: "Thành lập: 1959",
-      contact: "Liên hệ",
-      email: "Email: info@tlu.edu.vn",
-      phone: "Điện thoại: (+84) 24 3852 2201",
-      fax: "Fax: (+84) 24 3563 3351",
-      team: "Đội ngũ phát triển",
-      faculty: "Khoa Công nghệ thông tin",
-      department: "Bộ môn Lập trình",
-      copyright: `© ${new Date().getFullYear()} Tối ưu hóa Thép TLU`
-    }
-  };
-
-  const text = language === 'en' ? translations.en : translations.vi;
-
   return (
-    <footer className="bg-primary text-yellow-300 py-6 mt-8">
+    <footer className="bg-primary shadow-inner py-8 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <h3 className="text-lg font-semibold mb-4">{text.university}</h3>
-            <p className="mb-2">{text.address1}</p>
-            <p className="mb-2">{text.address2}</p>
-            <p>{text.founded}</p>
+            <h3 className="text-base font-semibold text-yellow-300 mb-3">Student Scientific Research Group:</h3>
+            <ol className="list-decimal ml-5 text-sm text-yellow-200 space-y-1">
+              <li>Nguyen Van A</li>
+              <li>Le Thi B</li>
+              <li>Vuong Thu C</li>
+            </ol>
+            <p className="mt-3 text-sm text-yellow-300">Instructor: Dinh Hoang Quan</p>
           </div>
-          
           <div>
-            <h3 className="text-lg font-semibold mb-4">{text.contact}</h3>
-            <p className="mb-2">{text.email}</p>
-            <p className="mb-2">{text.phone}</p>
-            <p>{text.fax}</p>
+            <h3 className="text-base font-semibold text-yellow-300 uppercase mb-3">Thuy Loi University</h3>
+            <address className="not-italic text-sm text-yellow-200 space-y-1">
+              <p>Address: 175 Tay Son, Dong Da, Hanoi</p>
+              <p>Phone: (024) 38522201 - Fax: (024) 35633351</p>
+              <p>Email: phonghcth@tlu.edu.vn</p>
+            </address>
           </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">{text.team}</h3>
-            <p className="mb-2">{text.faculty}</p>
-            <p className="mb-2">{text.department}</p>
-            <p>{text.copyright}</p>
-          </div>
+        </div>
+        <div className="mt-8 pt-6 border-t border-green-700">
+          <p className="text-center text-xs text-yellow-200">&copy; {new Date().getFullYear()} Thuy Loi University. All rights reserved.</p>
         </div>
       </div>
     </footer>
