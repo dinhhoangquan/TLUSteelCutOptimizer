@@ -22,8 +22,15 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   const handleExport = () => {
     try {
-      // Assuming the input data is available in result.inputData
-      exportToExcel(result.inputData || [], result);
+      // We need to pass the original steel items data that may be stored elsewhere
+      // For now, we'll create a placeholder with pattern lengths
+      const items = patterns.flatMap(pattern => 
+        pattern.cuttingLayout
+          .filter(piece => piece.type !== 'waste')
+          .map(piece => ({ length: piece.length, quantity: 1 }))
+      );
+      
+      exportToExcel(items, result);
       toast({
         title: "Export successful",
         description: "Results have been exported to Excel.",
