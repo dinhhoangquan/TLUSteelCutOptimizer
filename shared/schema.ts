@@ -5,7 +5,12 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  isVerified: boolean("is_verified").notNull().default(false),
+  verificationToken: text("verification_token"),
+  resetPasswordToken: text("reset_password_token"),
+  resetPasswordExpires: text("reset_password_expires"),
 });
 
 export const steelItems = pgTable("steel_items", {
@@ -27,6 +32,7 @@ export const optimizationResults = pgTable("optimization_results", {
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
+  email: true,
   password: true,
 });
 
@@ -85,3 +91,42 @@ export const OptimizationResultSchema = z.object({
 
 export type OptimizationPattern = z.infer<typeof OptimizationPatternSchema>;
 export type OptimizationResultData = z.infer<typeof OptimizationResultSchema>;
+
+// Authentication schemas
+export const SignUpSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"]
+});
+
+export const LoginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required")
+});
+
+export const VerifyEmailSchema = z.object({
+  token: z.string()
+});
+
+export const ResetPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address")
+});
+
+export const SetNewPasswordSchema = z.object({
+  token: z.string(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"]
+});
+
+export type SignUpData = z.infer<typeof SignUpSchema>;
+export type LoginData = z.infer<typeof LoginSchema>;
+export type VerifyEmailData = z.infer<typeof VerifyEmailSchema>;
+export type ResetPasswordData = z.infer<typeof ResetPasswordSchema>;
+export type SetNewPasswordData = z.infer<typeof SetNewPasswordSchema>;

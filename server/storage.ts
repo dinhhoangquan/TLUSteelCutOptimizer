@@ -3,7 +3,14 @@ import { users, type User, type InsertUser, steelItems, type SteelItem, type Ins
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByVerificationToken(token: string): Promise<User | undefined>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
+  verifyUser(id: number): Promise<User | undefined>;
+  setVerificationToken(id: number, token: string): Promise<User | undefined>;
+  setResetToken(id: number, token: string, expires: string): Promise<User | undefined>;
   getSteelItems(userId?: number): Promise<SteelItem[]>;
   createSteelItem(item: InsertSteelItem): Promise<SteelItem>;
   updateSteelItem(id: number, item: Partial<InsertSteelItem>): Promise<SteelItem | undefined>;
@@ -39,11 +46,89 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.verificationToken === token,
+    );
+  }
+
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.resetPasswordToken === token && 
+                user.resetPasswordExpires && 
+                new Date(user.resetPasswordExpires) > new Date(),
+    );
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      isVerified: false,
+      verificationToken: null,
+      resetPasswordToken: null,
+      resetPasswordExpires: null
+    };
     this.users.set(id, user);
     return user;
+  }
+  
+  async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      return undefined;
+    }
+    const updatedUser = { ...existingUser, ...updates };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  async verifyUser(id: number): Promise<User | undefined> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      return undefined;
+    }
+    const updatedUser = { 
+      ...existingUser, 
+      isVerified: true,
+      verificationToken: null 
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  async setVerificationToken(id: number, token: string): Promise<User | undefined> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      return undefined;
+    }
+    const updatedUser = { 
+      ...existingUser, 
+      verificationToken: token 
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  async setResetToken(id: number, token: string, expires: string): Promise<User | undefined> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      return undefined;
+    }
+    const updatedUser = { 
+      ...existingUser, 
+      resetPasswordToken: token,
+      resetPasswordExpires: expires
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
   async getSteelItems(userId?: number): Promise<SteelItem[]> {

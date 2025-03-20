@@ -6,9 +6,9 @@ export default function Footer() {
           <div>
             <h3 className="text-base font-semibold text-yellow-300 mb-3">Student Scientific Research Group:</h3>
             <ol className="list-decimal ml-5 text-sm text-yellow-200 space-y-1">
-              <li>Nguyen Van A</li>
-              <li>Le Thi B</li>
-              <li>Vuong Thu C</li>
+              <li>Tran Thi Duyen</li>
+              <li>Phung Thi Tien</li>
+              <li>Nguyen Duc Anh</li>
             </ol>
             <p className="mt-3 text-sm text-yellow-300">Instructor: Dinh Hoang Quan</p>
           </div>
