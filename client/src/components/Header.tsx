@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
-export default function Header() {
-  const [language, setLanguage] = useState<'en' | 'vi'>('en');
+interface HeaderProps {
+  language: 'en' | 'vi';
+  setLanguage: (lang: 'en' | 'vi') => void;
+}
 
+export default function Header({ language, setLanguage }: HeaderProps) {
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'vi' : 'en');
   };
