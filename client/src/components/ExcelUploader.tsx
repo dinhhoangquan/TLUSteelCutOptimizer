@@ -7,9 +7,54 @@ import * as XLSX from 'exceljs';
 
 interface ExcelUploaderProps {
   onDataLoaded: (data: { length: number; quantity: number }[]) => void;
+  language?: 'en' | 'vi';
 }
 
-export default function ExcelUploader({ onDataLoaded }: ExcelUploaderProps) {
+// Translations
+const translations = {
+  excelFileImportedSuccess: {
+    en: "Excel file imported successfully",
+    vi: "Tệp Excel đã được nhập thành công"
+  },
+  loaded: {
+    en: "Loaded",
+    vi: "Đã tải"
+  },
+  itemsFromFile: {
+    en: "items from the file.",
+    vi: "mục từ tệp."
+  },
+  errorImportingExcel: {
+    en: "Error importing Excel file",
+    vi: "Lỗi khi nhập tệp Excel"
+  },
+  unknownError: {
+    en: "Unknown error occurred",
+    vi: "Đã xảy ra lỗi không xác định"
+  },
+  importing: {
+    en: "Importing...",
+    vi: "Đang nhập..."
+  },
+  uploadExcel: {
+    en: "Upload Excel",
+    vi: "Tải lên Excel"
+  },
+  uploadInstructions: {
+    en: "Upload an Excel file with steel lengths in column A and quantities in column B. The first row should be the header row.",
+    vi: "Tải lên tệp Excel với chiều dài thép ở cột A và số lượng ở cột B. Dòng đầu tiên nên là dòng tiêu đề."
+  },
+  noWorksheets: {
+    en: "The Excel file contains no worksheets",
+    vi: "Tệp Excel không chứa bảng tính nào"
+  },
+  noValidData: {
+    en: "No valid data found in the Excel file",
+    vi: "Không tìm thấy dữ liệu hợp lệ trong tệp Excel"
+  }
+};
+
+export default function ExcelUploader({ onDataLoaded, language = 'en' }: ExcelUploaderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
@@ -27,7 +72,7 @@ export default function ExcelUploader({ onDataLoaded }: ExcelUploaderProps) {
       // Get the first worksheet
       const worksheet = workbook.worksheets[0];
       if (!worksheet) {
-        throw new Error("The Excel file contains no worksheets");
+        throw new Error(translations.noWorksheets[language]);
       }
       
       const data: { length: number; quantity: number }[] = [];
@@ -46,20 +91,20 @@ export default function ExcelUploader({ onDataLoaded }: ExcelUploaderProps) {
       });
       
       if (data.length === 0) {
-        throw new Error("No valid data found in the Excel file");
+        throw new Error(translations.noValidData[language]);
       }
       
       onDataLoaded(data);
       
       toast({
-        title: "Excel file imported successfully",
-        description: `Loaded ${data.length} items from the file.`,
+        title: translations.excelFileImportedSuccess[language],
+        description: `${translations.loaded[language]} ${data.length} ${translations.itemsFromFile[language]}`,
       });
       
     } catch (error) {
       toast({
-        title: "Error importing Excel file",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        title: translations.errorImportingExcel[language],
+        description: error instanceof Error ? error.message : translations.unknownError[language],
         variant: "destructive",
       });
     } finally {
@@ -85,12 +130,11 @@ export default function ExcelUploader({ onDataLoaded }: ExcelUploaderProps) {
           className="inline-flex items-center gap-2 border-primary text-primary hover:bg-primary/10"
         >
           <FileUp className="h-4 w-4" />
-          {isLoading ? "Importing..." : "Upload Excel"}
+          {isLoading ? translations.importing[language] : translations.uploadExcel[language]}
         </Button>
       </div>
       <p className="text-xs text-muted-foreground">
-        Upload an Excel file with steel lengths in column A and quantities in column B.
-        The first row should be the header row.
+        {translations.uploadInstructions[language]}
       </p>
     </div>
   );

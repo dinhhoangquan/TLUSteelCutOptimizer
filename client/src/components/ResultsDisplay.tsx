@@ -10,9 +10,66 @@ import { exportToExcel } from "@/lib/excelExport";
 
 interface ResultsDisplayProps {
   result: OptimizationResultData;
+  language?: 'en' | 'vi';
 }
 
-export default function ResultsDisplay({ result }: ResultsDisplayProps) {
+// Translations
+const translations = {
+  optimizationResults: {
+    en: "Optimization Results",
+    vi: "Kết quả tối ưu hóa"
+  },
+  summary: {
+    en: "Summary of the steel cutting optimization results",
+    vi: "Tóm tắt kết quả tối ưu hóa cắt thép"
+  },
+  optimizationComplete: {
+    en: "Optimization complete! Efficiency:",
+    vi: "Tối ưu hóa hoàn tất! Hiệu suất:"
+  },
+  totalMaterialUsed: {
+    en: "Total Material Used",
+    vi: "Tổng vật liệu sử dụng"
+  },
+  totalWaste: {
+    en: "Total Waste",
+    vi: "Tổng phế liệu"
+  },
+  efficiency: {
+    en: "Efficiency",
+    vi: "Hiệu suất"
+  },
+  exportToExcel: {
+    en: "Export to Excel",
+    vi: "Xuất ra Excel"
+  },
+  cuttingPatterns: {
+    en: "Cutting Patterns",
+    vi: "Mẫu cắt"
+  },
+  detailedView: {
+    en: "Detailed view of the optimal cutting patterns",
+    vi: "Xem chi tiết các mẫu cắt tối ưu"
+  },
+  pattern: {
+    en: "Pattern",
+    vi: "Mẫu"
+  },
+  cuttingLayout: {
+    en: "Cutting Layout",
+    vi: "Bố trí cắt"
+  },
+  waste: {
+    en: "Waste",
+    vi: "Phế liệu"
+  },
+  quantity: {
+    en: "Quantity",
+    vi: "Số lượng"
+  }
+};
+
+export default function ResultsDisplay({ result, language = 'en' }: ResultsDisplayProps) {
   const { patterns, summary } = result;
   const { toast } = useToast();
   
@@ -49,34 +106,34 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
       <Card className="border-primary/20 overflow-hidden">
         <div className="bg-primary h-2"></div>
         <CardHeader>
-          <CardTitle className="text-primary">Optimization Results</CardTitle>
+          <CardTitle className="text-primary">{translations.optimizationResults[language]}</CardTitle>
           <p className="text-sm text-gray-500">
-            Summary of the steel cutting optimization results
+            {translations.summary[language]}
           </p>
         </CardHeader>
         <CardContent>
           <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
             <p className="text-sm text-green-800 font-medium">
-              Optimization complete! Efficiency: {formatPercentage(summary.efficiency)}
+              {translations.optimizationComplete[language]} {formatPercentage(summary.efficiency)}
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="border-primary/10">
               <CardContent className="p-4">
-                <p className="text-sm text-gray-600">Total Material Used</p>
+                <p className="text-sm text-gray-600">{translations.totalMaterialUsed[language]}</p>
                 <p className="text-xl font-bold text-primary">{formatLength(summary.totalMaterial)}</p>
               </CardContent>
             </Card>
             <Card className="border-yellow-200">
               <CardContent className="p-4">
-                <p className="text-sm text-gray-600">Total Waste</p>
+                <p className="text-sm text-gray-600">{translations.totalWaste[language]}</p>
                 <p className="text-xl font-bold text-yellow-600">{formatLength(summary.totalWaste)}</p>
               </CardContent>
             </Card>
             <Card className="border-green-200">
               <CardContent className="p-4">
-                <p className="text-sm text-gray-600">Efficiency</p>
+                <p className="text-sm text-gray-600">{translations.efficiency[language]}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Progress value={summary.efficiency} className="flex-1 h-2" />
                   <span className="text-lg font-bold text-green-600">{formatPercentage(summary.efficiency)}</span>
@@ -91,16 +148,16 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             onClick={handleExport}
             className="inline-flex items-center gap-2 text-yellow-600 hover:text-yellow-700 border-yellow-600 hover:bg-yellow-50"
           >
-            <FileDown className="h-4 w-4" /> Export to Excel
+            <FileDown className="h-4 w-4" /> {translations.exportToExcel[language]}
           </Button>
         </CardFooter>
       </Card>
       
       <Card className="border-primary/20">
         <CardHeader className="bg-gray-50 border-b">
-          <CardTitle className="text-primary">Cutting Patterns</CardTitle>
+          <CardTitle className="text-primary">{translations.cuttingPatterns[language]}</CardTitle>
           <p className="text-sm text-gray-500">
-            Detailed view of the optimal cutting patterns
+            {translations.detailedView[language]}
           </p>
         </CardHeader>
         <CardContent className="pt-6">
@@ -108,10 +165,10 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50">
-                  <TableHead>Pattern</TableHead>
-                  <TableHead>Cutting Layout</TableHead>
-                  <TableHead>Waste</TableHead>
-                  <TableHead>Quantity</TableHead>
+                  <TableHead>{translations.pattern[language]}</TableHead>
+                  <TableHead>{translations.cuttingLayout[language]}</TableHead>
+                  <TableHead>{translations.waste[language]}</TableHead>
+                  <TableHead>{translations.quantity[language]}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

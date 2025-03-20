@@ -4,17 +4,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Calculator, Trash2, FileDown } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { apiRequest } from "@/lib/queryClient";
 import { OptimizationResultData, SteelItemsSchema } from "@shared/schema";
 import { exportToExcel } from "@/lib/excelExport";
-import { z } from "zod";
 import ExcelUploader from "./ExcelUploader";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SteelCuttingFormProps {
   onOptimizationResult: (result: OptimizationResultData) => void;
+  language?: 'en' | 'vi';
 }
 
 type SteelItem = {
@@ -22,7 +21,111 @@ type SteelItem = {
   quantity: number;
 };
 
-export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingFormProps) {
+// Translations
+const translations = {
+  uploadFromExcel: {
+    en: "Upload from Excel",
+    vi: "Tải lên từ Excel"
+  },
+  manualDataEntry: {
+    en: "Manual Data Entry",
+    vi: "Nhập dữ liệu thủ công"
+  },
+  number: {
+    en: "No.",
+    vi: "STT"
+  },
+  steelLength: {
+    en: "Steel Length (mm)",
+    vi: "Chiều dài thép (mm)"
+  },
+  quantity: {
+    en: "Quantity",
+    vi: "Số lượng"
+  },
+  action: {
+    en: "Action",
+    vi: "Hành động"
+  },
+  addRow: {
+    en: "Add Row",
+    vi: "Thêm dòng"
+  },
+  calculate: {
+    en: "Calculate",
+    vi: "Tính toán"
+  },
+  export: {
+    en: "Export",
+    vi: "Xuất"
+  },
+  cannotDeleteLastRow: {
+    en: "Cannot delete last row",
+    vi: "Không thể xóa dòng cuối cùng"
+  },
+  needAtLeastOneRow: {
+    en: "You need at least one row for data entry.",
+    vi: "Bạn cần ít nhất một dòng để nhập dữ liệu."
+  },
+  invalidData: {
+    en: "Invalid data",
+    vi: "Dữ liệu không hợp lệ"
+  },
+  enterAtLeastOneValidRow: {
+    en: "Please enter at least one valid row with positive length and quantity.",
+    vi: "Vui lòng nhập ít nhất một dòng hợp lệ với chiều dài và số lượng dương."
+  },
+  ensureAllEntriesValid: {
+    en: "Please ensure all entries have valid lengths and quantities.",
+    vi: "Hãy đảm bảo tất cả các mục nhập có chiều dài và số lượng hợp lệ."
+  },
+  validationError: {
+    en: "Validation error",
+    vi: "Lỗi xác thực"
+  },
+  unknownValidationError: {
+    en: "Unknown validation error",
+    vi: "Lỗi xác thực không xác định"
+  },
+  optimizationComplete: {
+    en: "Optimization complete",
+    vi: "Tối ưu hóa hoàn tất"
+  },
+  efficiency: {
+    en: "Efficiency",
+    vi: "Hiệu suất"
+  },
+  optimizationFailed: {
+    en: "Optimization failed",
+    vi: "Tối ưu hóa thất bại"
+  },
+  unknownError: {
+    en: "Unknown error occurred",
+    vi: "Đã xảy ra lỗi không xác định"
+  },
+  noDataToExport: {
+    en: "No data to export",
+    vi: "Không có dữ liệu để xuất"
+  },
+  calculateFirst: {
+    en: "Please calculate optimization results first.",
+    vi: "Vui lòng tính toán kết quả tối ưu hóa trước."
+  },
+  exportSuccessful: {
+    en: "Export successful",
+    vi: "Xuất thành công"
+  },
+  resultsExported: {
+    en: "Results have been exported to Excel.",
+    vi: "Kết quả đã được xuất ra Excel."
+  },
+  exportFailed: {
+    en: "Export failed",
+    vi: "Xuất thất bại"
+  }
+};
+
+export default function SteelCuttingForm({ onOptimizationResult, language = 'en' }: SteelCuttingFormProps) {
   const [rows, setRows] = useState<SteelItem[]>([{ length: 0, quantity: 0 }]);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<OptimizationResultData | null>(null);
@@ -42,8 +145,8 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
   const deleteRow = (index: number) => {
     if (rows.length === 1) {
       toast({
-        title: "Cannot delete last row",
-        description: "You need at least one row for data entry.",
+        title: translations.cannotDeleteLastRow[language],
+        description: translations.needAtLeastOneRow[language],
         variant: "destructive",
       });
       return;
@@ -60,8 +163,8 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
       
       if (filteredRows.length === 0) {
         toast({
-          title: "Invalid data",
-          description: "Please enter at least one valid row with positive length and quantity.",
+          title: translations.invalidData[language],
+          description: translations.enterAtLeastOneValidRow[language],
           variant: "destructive",
         });
         return null;
@@ -72,8 +175,8 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
       
       if (!result.success) {
         toast({
-          title: "Invalid data",
-          description: "Please ensure all entries have valid lengths and quantities.",
+          title: translations.invalidData[language],
+          description: translations.ensureAllEntriesValid[language],
           variant: "destructive",
         });
         return null;
@@ -82,8 +185,8 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
       return filteredRows;
     } catch (error) {
       toast({
-        title: "Validation error",
-        description: error instanceof Error ? error.message : "Unknown validation error",
+        title: translations.validationError[language],
+        description: error instanceof Error ? error.message : translations.unknownValidationError[language],
         variant: "destructive",
       });
       return null;
@@ -104,13 +207,13 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
       onOptimizationResult(data);
       
       toast({
-        title: "Optimization complete",
-        description: `Efficiency: ${data.summary.efficiency.toFixed(1)}%`,
+        title: translations.optimizationComplete[language],
+        description: `${translations.efficiency[language]}: ${data.summary.efficiency.toFixed(1)}%`,
       });
     } catch (error) {
       toast({
-        title: "Optimization failed",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        title: translations.optimizationFailed[language],
+        description: error instanceof Error ? error.message : translations.unknownError[language],
         variant: "destructive",
       });
     } finally {
@@ -121,8 +224,8 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
   const handleExport = () => {
     if (!result) {
       toast({
-        title: "No data to export",
-        description: "Please calculate optimization results first.",
+        title: translations.noDataToExport[language],
+        description: translations.calculateFirst[language],
         variant: "destructive",
       });
       return;
@@ -131,13 +234,13 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
     try {
       exportToExcel(rows, result);
       toast({
-        title: "Export successful",
-        description: "Results have been exported to Excel.",
+        title: translations.exportSuccessful[language],
+        description: translations.resultsExported[language],
       });
     } catch (error) {
       toast({
-        title: "Export failed",
-        description: error instanceof Error ? error.message : "Unknown error",
+        title: translations.exportFailed[language],
+        description: error instanceof Error ? error.message : translations.unknownError[language],
         variant: "destructive",
       });
     }
@@ -152,24 +255,28 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
       {/* Excel Upload Section */}
       <Card className="bg-green-50 border-green-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-medium text-green-800">Upload from Excel</CardTitle>
+          <CardTitle className="text-base font-medium text-green-800">
+            {translations.uploadFromExcel[language]}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <ExcelUploader onDataLoaded={handleExcelDataLoaded} />
+          <ExcelUploader onDataLoaded={handleExcelDataLoaded} language={language} />
         </CardContent>
       </Card>
 
       <Separator className="my-6" />
 
-      <h3 className="text-base font-medium mb-3">Manual Data Entry</h3>
+      <h3 className="text-base font-medium mb-3">
+        {translations.manualDataEntry[language]}
+      </h3>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-16">No.</TableHead>
-              <TableHead>Steel Length (mm)</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead className="w-16">Action</TableHead>
+              <TableHead className="w-16">{translations.number[language]}</TableHead>
+              <TableHead>{translations.steelLength[language]}</TableHead>
+              <TableHead>{translations.quantity[language]}</TableHead>
+              <TableHead className="w-16">{translations.action[language]}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -180,7 +287,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
                   <Input
                     type="number"
                     min="1"
-                    placeholder="Length"
+                    placeholder={language === 'en' ? "Length" : "Chiều dài"}
                     value={row.length || ""}
                     onChange={(e) => updateRow(index, "length", e.target.value)}
                   />
@@ -189,7 +296,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
                   <Input
                     type="number"
                     min="1"
-                    placeholder="Quantity"
+                    placeholder={language === 'en' ? "Quantity" : "Số lượng"}
                     value={row.quantity || ""}
                     onChange={(e) => updateRow(index, "quantity", e.target.value)}
                   />
@@ -218,7 +325,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
           onClick={addRow}
           className="inline-flex items-center gap-2"
         >
-          <Plus className="h-4 w-4" /> Add Row
+          <Plus className="h-4 w-4" /> {translations.addRow[language]}
         </Button>
         <Button
           type="button"
@@ -227,7 +334,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
           disabled={isLoading}
           className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
         >
-          <Calculator className="h-4 w-4" /> Calculate
+          <Calculator className="h-4 w-4" /> {translations.calculate[language]}
         </Button>
         <Button
           type="button"
@@ -236,7 +343,7 @@ export default function SteelCuttingForm({ onOptimizationResult }: SteelCuttingF
           disabled={!result}
           className="inline-flex items-center gap-2 text-yellow-600 hover:text-yellow-700 border-yellow-600 hover:bg-yellow-50"
         >
-          <FileDown className="h-4 w-4" /> Export
+          <FileDown className="h-4 w-4" /> {translations.export[language]}
         </Button>
       </div>
     </form>
