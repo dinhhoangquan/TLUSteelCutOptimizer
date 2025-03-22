@@ -182,7 +182,7 @@ print(json.dumps(result))
   // Run the optimization script
   return new Promise<OptimizationResultData>((resolve, reject) => {
     exec(
-      `python "${scriptPath}" "${inputFilePath}"`,
+      `python3 "${scriptPath}" "${inputFilePath}"`,
       (error, stdout, stderr) => {
         // Clean up temporary files
         fs.unlink(scriptPath).catch((err) =>
@@ -194,12 +194,18 @@ print(json.dumps(result))
 
         if (error) {
           console.error(`Error executing optimization script: ${error.message}`);
-          reject(error);
+          console.error(`stderr: ${stderr}`);
+          reject(new Error(`Optimization script failed: ${error.message}`));
           return;
         }
 
         if (stderr) {
           console.error(`Optimization script stderr: ${stderr}`);
+          // Nếu stderr có nội dung, có thể là lỗi từ Python (ví dụ: thiếu module)
+          if (stderr.includes("ModuleNotFoundError") || stderr.includes("ImportError")) {
+            reject(new Error(`Python script error: ${stderr}`));
+            return;
+          }
         }
 
         try {
