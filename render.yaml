@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: tlu-steel-cut-optimizer
+    env: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: free
+    branch: main
+    rootDir: .
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0 # Đồng bộ với phiên bản Node.js trên local
+      - key: SESSION_SECRET
+        sync: false # Nhập thủ công trên Render Dashboard để bảo mật
+      - key: NODE_ENV
+        value: production
+    autoDeploy: false

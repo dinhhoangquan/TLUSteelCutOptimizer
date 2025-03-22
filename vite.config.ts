@@ -33,4 +33,9 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
   },
+  server: {
+    port: 5173, // Port mặc định của Vite, bạn có thể đổi nếu cần
+    host: '127.0.0.1', // Sử dụng IPv4 để tránh lỗi ENOTSUP
+    strictPort: true, // Ngăn Vite tự động chọn port khác nếu port bị chiếm dụng
+  },
 });

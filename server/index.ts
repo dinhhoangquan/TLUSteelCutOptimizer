@@ -9,16 +9,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Setup session middleware
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'tlu-steel-cutting-app-secret',
-  resave: false,
-  saveUninitialized: false,
-  store: new MemoryStore(), // In production, use a more robust store like Redis or MongoDB
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "tlu-steel-cutting-app-secret",
+    resave: false,
+    saveUninitialized: false,
+    store: new MemoryStore(), // In production, use a more robust store like Redis or MongoDB
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -61,24 +63,29 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  // Sử dụng process.env.NODE_ENV để xác định môi trường
+  if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  // Define the port
+  const port = 3000;
+  const host = process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1";
+
+  // Listen on the specified port and host
+  server.listen(port, host, () => {
+    log(`Serving on http://${host}:${port}`);
+  });
+
+  // Handle errors during server startup
+  server.on("error", (error: NodeJS.ErrnoException) => {
+    if (error.code === "EADDRINUSE") {
+      log(`Port ${port} is already in use. Please try a different port.`);
+    } else {
+      log(`Failed to start server: ${error.message}`);
+    }
+    process.exit(1);
   });
 })();

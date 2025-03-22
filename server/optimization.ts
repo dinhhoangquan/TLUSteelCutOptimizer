@@ -1,28 +1,39 @@
-import { exec } from 'child_process';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { OptimizationResultData } from '@shared/schema';
+import { exec } from "child_process";
+import { promises as fs } from "fs";
+import path from "path";
+import { OptimizationResultData } from "@shared/schema";
 
 // Function to directly run the optimization with JSON input
-async function runOptimization(items: { length: number; quantity: number }[]): Promise<OptimizationResultData> {
+async function runOptimization(
+  items: { length: number; quantity: number }[]
+): Promise<OptimizationResultData> {
   // Create temp directory if it doesn't exist
-  const tempDir = path.join(process.cwd(), 'temp');
+  const tempDir = path.join(process.cwd(), "temp");
   try {
     await fs.mkdir(tempDir, { recursive: true });
   } catch (error) {
-    console.error('Error creating temp directory:', error);
+    console.error("Error creating temp directory:", error);
+    throw error;
   }
-  
+
   // Create Python script for optimization
-  const scriptPath = path.join(tempDir, 'run_optimization.py');
-  
+  const scriptPath = path.join(tempDir, "run_optimization.py");
+  const inputFilePath = path.join(tempDir, "input_data.json");
+
   const pythonScript = `
 import sys
 import json
 from pulp import LpProblem, LpMinimize, LpVariable, lpSum, LpStatus, LpContinuous, LpInteger, PULP_CBC_CMD
 
-# Read input data from command line argument
-input_data = json.loads(sys.argv[1])
+# Read input data from file
+input_file_path = sys.argv[1]
+try:
+    with open(input_file_path, 'r') as f:
+        input_data = json.load(f)
+except Exception as e:
+    print(json.dumps({"error": f"Failed to read or parse input file: {str(e)}"}))
+    sys.exit(1)
+
 lengths = [item["length"] for item in input_data]
 demands = [item["quantity"] for item in input_data]
 n_types = len(lengths)
@@ -162,54 +173,71 @@ result = {
 print(json.dumps(result))
 `;
 
+  // Write the Python script
   await fs.writeFile(scriptPath, pythonScript);
-  
+
+  // Write the input data to a temporary JSON file
+  await fs.writeFile(inputFilePath, JSON.stringify(items));
+
   // Run the optimization script
   return new Promise<OptimizationResultData>((resolve, reject) => {
-    exec(`python ${scriptPath} '${JSON.stringify(items)}'`, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error executing optimization script: ${error}`);
-        reject(error);
-        return;
-      }
-      
-      if (stderr) {
-        console.error(`Optimization script stderr: ${stderr}`);
-      }
-      
-      try {
-        // Parse the result
-        const result = JSON.parse(stdout);
-        
-        if (result.error) {
-          reject(new Error(result.error));
+    exec(
+      `python "${scriptPath}" "${inputFilePath}"`,
+      (error, stdout, stderr) => {
+        // Clean up temporary files
+        fs.unlink(scriptPath).catch((err) =>
+          console.error("Error deleting script file:", err)
+        );
+        fs.unlink(inputFilePath).catch((err) =>
+          console.error("Error deleting input file:", err)
+        );
+
+        if (error) {
+          console.error(`Error executing optimization script: ${error.message}`);
+          reject(error);
           return;
         }
-        
-        resolve(result as OptimizationResultData);
-      } catch (parseError) {
-        console.error(`Error parsing optimization result: ${parseError}`);
-        console.error(`Raw output: ${stdout}`);
-        reject(parseError);
+
+        if (stderr) {
+          console.error(`Optimization script stderr: ${stderr}`);
+        }
+
+        try {
+          // Parse the result
+          const result = JSON.parse(stdout);
+
+          if (result.error) {
+            reject(new Error(result.error));
+            return;
+          }
+
+          resolve(result as OptimizationResultData);
+        } catch (parseError) {
+          console.error(`Error parsing optimization result: ${parseError}`);
+          console.error(`Raw output: ${stdout}`);
+          reject(parseError);
+        }
       }
-    });
+    );
   });
 }
 
 // Main optimization function
-export async function optimizeSteelCutting(items: { length: number; quantity: number }[]): Promise<OptimizationResultData> {
+export async function optimizeSteelCutting(
+  items: { length: number; quantity: number }[]
+): Promise<OptimizationResultData> {
   try {
     // Validate input
     if (!items || items.length === 0) {
-      throw new Error('No items provided for optimization');
+      throw new Error("No items provided for optimization");
     }
-    
+
     // Run optimization directly with JSON
     const result = await runOptimization(items);
-    
+
     return result;
   } catch (error) {
-    console.error('Error in steel cutting optimization:', error);
+    console.error("Error in steel cutting optimization:", error);
     throw error;
   }
 }
