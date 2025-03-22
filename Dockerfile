@@ -12,7 +12,6 @@ RUN /opt/venv/bin/pip install pulp
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Tạo thư mục làm việc
-RUN chmod -R 777 /app
 WORKDIR /app
 
 # Sao chép package.json và cài đặt dependencies
